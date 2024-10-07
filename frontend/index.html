@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decentralized Plagiarism Checker</title>
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js"></script>
+</head>
+<body>
+    <h1>Decentralized Plagiarism Checker</h1>
+    <input type="text" id="documentHash" placeholder="Enter Document Hash">
+    <button onclick="addDocument()">Add Document</button>
+    <button onclick="checkPlagiarism()">Check Plagiarism</button>
+    <div id="result"></div>
+    
+    <script>
+        const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+        const contractABI = [ /* Contract ABI goes here */ ];
+        const contractAddress = "YOUR_CONTRACT_ADDRESS";
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+        async function addDocument() {
+            const hash = document.getElementById("documentHash").value;
+            const accounts = await web3.eth.requestAccounts();
+            contract.methods.addDocument(hash).send({ from: accounts[0] })
+                .then(receipt => document.getElementById("result").innerText = "Document added: " + receipt.transactionHash)
+                .catch(error => document.getElementById("result").innerText = "Error: " + error.message);
+        }
+
+        async function checkPlagiarism() {
+            const hash = document.getElementById("documentHash").value;
+            const result = await contract.methods.checkPlagiarism(hash).call();
+            document.getElementById("result").innerText = result ? "Document already exists." : "No plagiarism detected.";
+        }
+    </script>
+</body>
+</html>
